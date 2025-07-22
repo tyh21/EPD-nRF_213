@@ -317,9 +317,9 @@ static void DrawClock(Adafruit_GFX *gfx, tm_t *tm, struct Lunar_Date *Lunar, gui
 
     uint8_t day = 0;
     uint8_t JQday = GetJieQiStr(tm->tm_year + YEAR0, tm->tm_mon + 1, tm->tm_mday, &day);
-    if (day == 0) {
-        GFX_setCursor(gfx, 6, 80);
-        GFX_printf(gfx, "%s", JieQiStr[JQday % 24]);
+    if (day == 0) {                                                                   //节气
+        GFX_setCursor(gfx, 6, 110);
+        GFX_printf(gfx, "%s", JieQiStr[JQday % 24]);                                                                        
     } else {
         GFX_setCursor(gfx, 6, 95);
         GFX_printf(gfx, "离%s", JieQiStr[JQday % 24]);
