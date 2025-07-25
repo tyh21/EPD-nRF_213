@@ -175,6 +175,38 @@ void SSD1619_Sleep(void)
     delay(100);
 }
 
+void SSD1619_Write_Partial_Image_Data(uint8_t *black, uint16_t x, uint16_t y, uint16_t w, uint16_t h)
+{
+    epd_model_t *EPD = epd_get();
+    uint16_t wb = (w + 7) / 8;
+    x -= x % 8;
+    w = wb * 8;
+    if (x + w > EPD->width || y + h > EPD->height) return;
+
+    _setPartialRamArea(x, y, w, h);
+    EPD_WriteCommand(CMD_WRITE_RAM1);
+    for (uint16_t i = 0; i < h; i++) {
+        for (uint16_t j = 0; j < w / 8; j++) {
+            EPD_WriteByte(black[j + i * wb]);
+        }
+    }
+}
+
+void SSD1619_Partial_Refresh_Area(uint16_t x, uint16_t y, uint16_t w, uint16_t h)
+{
+    // Reset (optional, depending on the specific partial refresh sequence)
+    // EPD_Reset(HIGH, 1); // Short reset
+    EPD_WriteCommand(CMD_BORDER_CTRL); // 0x3C
+    EPD_WriteByte(0x80);
+    EPD_WriteCommand(CMD_DRIVER_CTRL); // 0x01
+    EPD_WriteByte(0xF9);
+    EPD_WriteByte(0x00);
+    EPD_WriteByte(0x00);
+    _setPartialRamArea(x, y, w, h);
+    SSD1619_Update(0xff); // Trigger partial refresh
+    SSD1619_WaitBusy(30000); // Wait for busy signal
+}
+
 static epd_driver_t epd_drv_ssd1619 = {
     .init = SSD1619_Init,
     .clear = SSD1619_Clear,
@@ -183,6 +215,8 @@ static epd_driver_t epd_drv_ssd1619 = {
     .sleep = SSD1619_Sleep,
     .read_temp = SSD1619_Read_Temp,
     .force_temp = SSD1619_Force_Temp,
+    .write_partial_image = SSD1619_Write_Partial_Image_Data,
+    .partial_refresh = SSD1619_Partial_Refresh_Area,
     .cmd_write_ram1 = CMD_WRITE_RAM1,
     .cmd_write_ram2 = CMD_WRITE_RAM2,
 };
@@ -213,3 +247,5 @@ const epd_model_t epd_ssd1619_213_bwr = {
     .height = 250,
     .bwr = true,
 };
+
+

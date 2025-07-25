@@ -54,35 +54,6 @@ static void epd_gui_update(void * p_event_data, uint16_t event_size)
     app_feed_wdt();
 }
 
-static void epd_gui_part_update(void * p_event_data, uint16_t event_size)
-{
-    epd_gui_update_event_t *event = (epd_gui_update_event_t *)p_event_data;
-    ble_epd_t *p_epd = event->p_epd;
-
-    EPD_GPIO_Init();
-
-    epd_model_t *epd = epd_init((epd_model_id_t)p_epd->config.model_id);
-    epd->bwr = false; 
-    gui_data_t data = {
-        .bwr             = epd->bwr,
-        .width           = epd->width,
-        .height          = epd->height,
-        .timestamp       = event->timestamp,
-        .temperature     = epd->drv->read_temp(),
-        .voltage         = EPD_ReadVoltage(),
-    };
-    EPD_Reset(HIGH, 1); 
-    DrawGUITime(&data, epd->drv->write_partial_image);
-    epd->drv->read_temp();
-    EPD_WriteCommand(0x22); // Display Update Control 2
-    EPD_WriteByte(0xF4);    // 0xF4 = 执行一次只更新黑/白通道的全屏刷新
-    EPD_WriteCommand(0x20); // Master Activation
-    EPD_WaitBusy(HIGH, 5000); // 等待刷新完成
-    epd->drv->sleep();
-    EPD_GPIO_Uninit();
-    app_feed_wdt();
-}
-
 /**@brief Function for handling the @ref BLE_GAP_EVT_CONNECTED event from the S110 SoftDevice.
  *
  * @param[in] p_epd     EPD Service structure.
@@ -423,5 +394,3 @@ void ble_epd_on_timer(ble_epd_t * p_epd, uint32_t timestamp, bool force_update)
         app_sched_event_put(&event, sizeof(epd_gui_update_event_t), epd_gui_part_update);
     }
 }
-
-

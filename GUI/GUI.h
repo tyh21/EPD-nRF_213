@@ -24,4 +24,12 @@ typedef struct {
 
 void DrawGUI(gui_data_t *data, buffer_callback draw, display_mode_t mode);
 
-#endif
+/**
+ * @brief 仅绘制并更新时钟的分钟个位数（局部刷新）
+ * @param data GUI数据
+ * @param write_partial_image 驱动层提供的局部图像写入函数指针
+ */
+// 最终修正：使用与 EPD_driver.h 完全匹配的5参数函数指针原型
+void DrawGUITime(gui_data_t *data, void (*write_partial_image)(uint8_t*, uint16_t, uint16_t, uint16_t, uint16_t));
+
+#endif // __GUI_H

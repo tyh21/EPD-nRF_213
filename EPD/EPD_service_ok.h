@@ -122,7 +122,7 @@ void ble_epd_sleep_prepare(ble_epd_t * p_epd);
  */
 uint32_t ble_epd_init(ble_epd_t * p_epd);
 
-/**@brief Function for handling the EPD Service\'s BLE events.
+/**@brief Function for handling the EPD Service's BLE events.
  *
  * @details The EPD Service expects the application to call this function each time an
  * event is received from the S110 SoftDevice. This function processes the event if it
@@ -149,12 +149,6 @@ uint32_t ble_epd_string_send(ble_epd_t * p_epd, uint8_t * p_string, uint16_t len
 
 void ble_epd_on_timer(ble_epd_t * p_epd, uint32_t timestamp, bool force_update);
 
-// Function declarations for scheduler events
-void epd_gui_update(void * p_event_data, uint16_t event_size);
-void epd_gui_part_update(void * p_event_data, uint16_t event_size);
-
-#endif // __EPD_SERVICE_H
+#endif // EPD_BLE_H__
 
 /** @} */
-
-
